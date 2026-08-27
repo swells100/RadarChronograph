@@ -1,0 +1,7 @@
+1) normal
+2) garmin
+3) above
+4) left
+5) right
+6) down
+7) behind
