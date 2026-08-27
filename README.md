@@ -1,2 +1,2 @@
 # Radar Chronograph
-Also rat-based system
+Manual source code available at: https://github.com/swells100/RadarChronographManual
