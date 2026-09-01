@@ -1,3 +1,6 @@
 [submodule "Board"]
 	path = Board
 	url = https://github.com/swells100/RadarChronographBoard.git
+[submodule "Manual"]
+	path = Manual
+	url = https://github.com/swells100/RadarChronographManual
