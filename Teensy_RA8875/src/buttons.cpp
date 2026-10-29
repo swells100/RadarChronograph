@@ -25,7 +25,7 @@ static ButtonData data2 = {
 };
 
 static ButtonData data3 = {
-    0, "TEST2", "TEST2!",
+    0, "TEST2", "TEST2+",
     lv_color_hex(0x808080), lv_color_hex(0xFF9800)
 };
 
