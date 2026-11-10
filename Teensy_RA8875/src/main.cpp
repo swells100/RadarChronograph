@@ -20,8 +20,12 @@
 
 static constexpr uint8_t CTP_ADDR = 0x38;
 
-static constexpr uint16_t TFT_WIDTH  = 480;
-static constexpr uint16_t TFT_HEIGHT = 272;
+// Native RA8875 dimensions
+static constexpr uint16_t TFT_NATIVE_WIDTH  = 480;
+static constexpr uint16_t TFT_NATIVE_HEIGHT = 272;
+// LVGL dimensions after 90-degree clockwise rotation
+static constexpr uint16_t TFT_WIDTH  = 272;
+static constexpr uint16_t TFT_HEIGHT = 480;
 
 // LVGL partial-render buffer: 40 RGB565 rows
 static constexpr uint16_t BUFFER_ROWS = 40;
@@ -35,6 +39,8 @@ static lv_indev_t *lvTouch = nullptr;
 
 // RGB565 draw buffer: 38,400 bytes
 static uint16_t drawBuffer[TFT_WIDTH * BUFFER_ROWS];
+// Temporary buffer for rotated display rows
+static uint16_t rotatedRow[BUFFER_ROWS];
 
 // FT5206 I2C functions
 
@@ -86,10 +92,7 @@ static void writeTouchRegister(uint8_t reg, uint8_t value)
 
 // LVGL display flush
 
-static void displayFlush(
-    lv_display_t *display,
-    const lv_area_t *area,
-    uint8_t *pixelMap)
+static void displayFlush(lv_display_t *display,const lv_area_t *area,uint8_t *pixelMap)
 {
     const int32_t width = area->x2 - area->x1 + 1;
     const int32_t height = area->y2 - area->y1 + 1;
@@ -97,11 +100,33 @@ static void displayFlush(
     uint16_t *pixels =
         reinterpret_cast<uint16_t *>(pixelMap);
 
-    for (int32_t row = 0; row < height; row++) {
-        tft.drawPixels( &pixels[row * width], width,area->x1,area->y1 + row);
+    //for (int32_t row = 0; row < height; row++) {
+    //    tft.drawPixels( &pixels[row * width], width,area->x1,area->y1 + row);
+    //}
+     // Each LVGL column becomes one native display row.
+    for (int32_t col = 0; col < width; col++) {
+
+        // Reverse the LVGL row order for clockwise rotation.
+        for (int32_t row = 0; row < height; row++) {
+            rotatedRow[row] =
+                pixels[(height - 1 - row) * width + col];
+        }
+
+        const int16_t nativeX =
+            TFT_NATIVE_WIDTH - 1 - area->y2;
+
+        const int16_t nativeY =
+            area->x1 + col;
+
+        // Write this rotated row as a bulk pixel transfer.
+        tft.drawPixels(
+            rotatedRow,
+            height,
+            nativeX,
+            nativeY
+        );
     }
 
-    // Allow LVGL to reuse the draw buffer.
     lv_display_flush_ready(display);
 }
 
@@ -129,14 +154,37 @@ static void touchRead(
         return;
     }
 
-    uint16_t x = ((uint16_t)(touchData[0] & 0x0F) << 8) | touchData[1];
+    //uint16_t x = ((uint16_t)(touchData[0] & 0x0F) << 8) | touchData[1];
 
-    uint16_t y = ((uint16_t)(touchData[2] & 0x0F) << 8) | touchData[3];
+    //uint16_t y = ((uint16_t)(touchData[2] & 0x0F) << 8) | touchData[3];
 
-    if (x >= TFT_WIDTH || y >= TFT_HEIGHT) {
+    //if (x >= TFT_WIDTH || y >= TFT_HEIGHT) {
+    //    data->state = LV_INDEV_STATE_RELEASED;
+    //    return;
+    //}
+
+    //data->point.x = x;
+    //data->point.y = y;
+    //data->state = LV_INDEV_STATE_PRESSED;
+    uint16_t rawX =
+        ((uint16_t)(touchData[0] & 0x0F) << 8) |
+        touchData[1];
+
+    uint16_t rawY =
+        ((uint16_t)(touchData[2] & 0x0F) << 8) |
+        touchData[3];
+
+    // Validate against the native landscape display.
+    if (rawX >= TFT_NATIVE_WIDTH ||
+        rawY >= TFT_NATIVE_HEIGHT) {
         data->state = LV_INDEV_STATE_RELEASED;
         return;
     }
+
+    // Convert native touch coordinates to portrait LVGL coordinates.
+    // This is the inverse of the display-flush mapping.
+    uint16_t x = rawY;
+    uint16_t y = TFT_NATIVE_WIDTH - 1 - rawX;
 
     data->point.x = x;
     data->point.y = y;
