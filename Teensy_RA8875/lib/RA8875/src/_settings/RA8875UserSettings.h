@@ -60,7 +60,7 @@ The Capacitive Touch Screen use a I2C chip called FT5206 (hardwired to address 0
 Please choose at list one (NOT both), if you comment both it's the same as _AVOID_TOUCHSCREEN*/
 
 //#define USE_RA8875_TOUCH//resistive touch screen
-//#define USE_FT5206_TOUCH//capacitive touch screen
+#define USE_FT5206_TOUCH//capacitive touch screen
 
 
 

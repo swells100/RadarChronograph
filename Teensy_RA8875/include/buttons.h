@@ -1,9 +1,11 @@
 #ifndef BUTTONS_H
 #define BUTTONS_H
 
-extern int variable1;
-extern int variable2;
+extern int ARM;
+extern int Portrait;
 extern int variable3;
+extern int ShotTime;
+extern int ScreenBrightness;
 
 void create_buttons();
 

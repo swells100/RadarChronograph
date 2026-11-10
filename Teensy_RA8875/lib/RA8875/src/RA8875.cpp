@@ -3802,7 +3802,8 @@ void RA8875::writeRect(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_
 
 	if (portrait_mode) {
 		pcolors += (w - 1);
-		for (uint16_t x = start_x + w - 1; x >= start_x; x--) {
+		for (uint32_t x = start_x + w - 1; x >= start_x; x--) {
+			if (x == 0) break; // prevent underflow
 			const uint16_t *pimage = pcolors;
 			for (uint16_t i = 0; i < h; i++) {
 				rotated_row[i] = *pimage;
@@ -4309,7 +4310,7 @@ void RA8875::fillEllipse(int16_t xCenter, int16_t yCenter, int16_t longAxis, int
       yCenter:   y location of the ellipse center
       longAxis:  Size in pixels of the long axis
       shortAxis: Size in pixels of the short axis
-      curvePart: Curve to draw in clock-wise dir: 0[180-270°],1[270-0°],2[0-90°],3[90-180°]
+      curvePart: Curve to draw in clock-wise dir: 0[180-270ï¿½],1[270-0ï¿½],2[0-90ï¿½],3[90-180ï¿½]
       color: RGB565 color
 */
 /**************************************************************************/
@@ -4334,7 +4335,7 @@ void RA8875::drawCurve(int16_t xCenter, int16_t yCenter, int16_t longAxis, int16
       yCenter:   y location of the ellipse center
       longAxis:  Size in pixels of the long axis
       shortAxis: Size in pixels of the short axis
-      curvePart: Curve to draw in clock-wise dir: 0[180-270°],1[270-0°],2[0-90°],3[90-180°]
+      curvePart: Curve to draw in clock-wise dir: 0[180-270ï¿½],1[270-0ï¿½],2[0-90ï¿½],3[90-180ï¿½]
       color: RGB565 color
 */
 /**************************************************************************/
