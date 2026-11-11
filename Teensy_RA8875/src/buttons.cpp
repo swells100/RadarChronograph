@@ -15,6 +15,7 @@ static lv_obj_t *settings_screen;
 static lv_obj_t *display_screen;
 static lv_obj_t *shot_slider;
 static lv_obj_t *brightness_slider;
+static lv_obj_t *arm_button;
 
 
 // =====================================================
@@ -43,7 +44,7 @@ int ScreenBrightness = 100;
 static ButtonData data1 = {0,"ARM","ARMED",lv_color_hex(0x808080),lv_color_hex(0xFF0000)};
 
 // TEST2
-static ButtonData data3 = {0,"TEST2","TEST2+",lv_color_hex(0x808080),lv_color_hex(0xFF9800)};
+//static ButtonData data3 = {0,"TEST2","TEST2+",lv_color_hex(0x808080),lv_color_hex(0xFF9800)};
 
 // =====================================================
 // MAIN BUTTON CALLBACK
@@ -73,10 +74,10 @@ static void button_cb(lv_event_t* event)
     {
         ARM = data->value;
     }
-    else if (data == &data3)
-    {
-        variable3 = data->value;
-    }
+    //else if (data == &data3)
+    //{
+    //    variable3 = data->value;
+    //}
 }
 
 static void shot_time_cb(lv_event_t* event)
@@ -208,13 +209,36 @@ static lv_obj_t* create_button(
     return button;
 }
 
+void set_arm_state(bool armed)
+{
+    ARM = armed ? 1 : 0;
+    data1.value = ARM;
+
+    if (arm_button == NULL)
+        return;
+
+    lv_obj_t* label = lv_obj_get_child(arm_button, 0);
+
+    if (ARM)
+    {
+        lv_label_set_text(label, data1.text_on);
+        lv_obj_set_style_bg_color(arm_button, data1.color_on, LV_PART_MAIN);
+    }
+    else
+    {
+        lv_label_set_text(label, data1.text_off);
+        lv_obj_set_style_bg_color(arm_button, data1.color_off, LV_PART_MAIN);
+    }
+}
+
 // =====================================================
 // CREATE PAGE HEADER
 // =====================================================
 
 static void create_page_header(lv_obj_t* parent,const char* back_text,const char* title_text,lv_obj_t* destination_screen)
 {
-    lv_obj_t* back_button = create_button(parent,10, 10,100, 45,back_text,lv_color_hex(0x303F50),destination_screen);
+    lv_obj_t* back_button = create_button(parent,0, 0,100, 45,back_text,lv_color_hex(0x303F50),destination_screen);
+    lv_obj_set_style_radius(back_button, 0, LV_PART_MAIN);
     lv_obj_t* title = lv_label_create(parent);
     lv_label_set_text(title,title_text);
     lv_obj_set_style_text_color(title,lv_color_white(),LV_PART_MAIN);
@@ -230,11 +254,13 @@ static void create_main_screen()
     lv_obj_set_style_bg_color(main_screen,lv_color_hex(0x000000),LV_PART_MAIN);
 
     // Settings button
-    create_button(main_screen, 10, 10, 110, 45,"SETTINGS",lv_color_hex(0x303F50),settings_screen);
+    lv_obj_t* settings_button = create_button(main_screen, 0, 0, 110, 45,"SETTINGS",lv_color_hex(0x303F50),settings_screen);
+    lv_obj_set_style_radius(settings_button, 0, LV_PART_MAIN);
     // ARM button
-    create_button(main_screen, 20, 90, 130, 60,"ARM",lv_color_hex(0x808080),nullptr, &data1);
+    arm_button = create_button(main_screen, 0, 0, 130, 60,"ARM",lv_color_hex(0x808080),nullptr, &data1);
+    lv_obj_align(arm_button, LV_ALIGN_BOTTOM_LEFT, 20, -20);
     // TEST2 button
-    create_button(main_screen, 20, 170, 130, 60,"TEST2",lv_color_hex(0x808080),nullptr, &data3);
+    //create_button(main_screen, 20, 170, 130, 60,"TEST2",lv_color_hex(0x808080),nullptr, &data3);
 }
 
 // =====================================================

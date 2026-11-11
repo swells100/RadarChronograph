@@ -37,10 +37,13 @@ void loop()
         Serial.println("ARM is ON");
 
     if (Portrait == 1)
+    {
         Serial.println("Portrait mode is ON");
+        //set_arm_state(false);
+    }
 
-    if (variable3 == 1)
-        Serial.println("Button 3 is ON");
+    //if (variable3 == 1)
+    //    Serial.println("Button 3 is ON");
 
     if (ShotTime != previousShotTime)
     {
