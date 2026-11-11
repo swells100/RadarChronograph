@@ -46,6 +46,24 @@ static ButtonData data1 = {0,"ARM","ARMED",lv_color_hex(0x808080),lv_color_hex(0
 // TEST2
 //static ButtonData data3 = {0,"TEST2","TEST2+",lv_color_hex(0x808080),lv_color_hex(0xFF9800)};
 
+static void update_toggle_button(lv_obj_t* button, ButtonData* data)
+{
+    if (button == nullptr) return;
+
+    lv_obj_t* label = lv_obj_get_child(button, 0);
+
+    lv_label_set_text(
+        label,
+        data->value ? data->text_on : data->text_off
+    );
+
+    lv_obj_set_style_bg_color(
+        button,
+        data->value ? data->color_on : data->color_off,
+        LV_PART_MAIN
+    );
+}
+
 // =====================================================
 // MAIN BUTTON CALLBACK
 // =====================================================
@@ -53,31 +71,17 @@ static ButtonData data1 = {0,"ARM","ARMED",lv_color_hex(0x808080),lv_color_hex(0
 static void button_cb(lv_event_t* event)
 {
     lv_obj_t* button = (lv_obj_t*)lv_event_get_target(event);
-    lv_obj_t* label = lv_obj_get_child(button, 0);
     ButtonData* data = (ButtonData*)lv_event_get_user_data(event);
 
     data->value = !data->value;
 
-    if (data->value)
-    {
-        lv_label_set_text(label,data->text_on);
-        lv_obj_set_style_bg_color(button,data->color_on,LV_PART_MAIN);
-    }
-    else
-    {
-        lv_label_set_text(label,data->text_off);
-        lv_obj_set_style_bg_color(button,data->color_off,LV_PART_MAIN);
-    }
+    update_toggle_button(button, data);
 
     // Update hardware-readable variables
     if (data == &data1)
     {
         ARM = data->value;
     }
-    //else if (data == &data3)
-    //{
-    //    variable3 = data->value;
-    //}
 }
 
 static void shot_time_cb(lv_event_t* event)
@@ -95,28 +99,23 @@ static void shot_time_cb(lv_event_t* event)
 // =====================================================
 // ORIENTATION SWITCH CALLBACK
 // =====================================================
-static void orientation_update_cb(lv_timer_t* timer)
+void buttons_update_layout()
 {
-    // Wait until screen_process_orientation() finishes
-    if (lv_display_get_horizontal_resolution(lv_display_get_default()) ==
-        (Portrait ? 272 : 480))
-    {
-        int screen_width = lv_display_get_horizontal_resolution(lv_display_get_default());
+    int screen_width = Portrait ? 272 : 480;
+
+    if (shot_slider != nullptr)
         lv_obj_set_width(shot_slider, screen_width * 63 / 100);
+
+    if (brightness_slider != nullptr)
         lv_obj_set_width(brightness_slider, screen_width * 63 / 100);
-        lv_timer_delete(timer);
-    }
 }
 static void orientation_cb(lv_event_t* event)
 {
     lv_obj_t* sw = (lv_obj_t*)lv_event_get_target(event);
 
-    Portrait = lv_obj_has_state(sw, LV_STATE_CHECKED) ? 1 : 0;
+    Portrait = lv_obj_has_state(sw, LV_STATE_CHECKED);
 
     screen_toggle_orientation();
-
-    // Check every 20 ms until the display resolution changes
-    lv_timer_create(orientation_update_cb, 20, NULL);
 
     save_settings();
 }
@@ -214,21 +213,7 @@ void set_arm_state(bool armed)
     ARM = armed ? 1 : 0;
     data1.value = ARM;
 
-    if (arm_button == NULL)
-        return;
-
-    lv_obj_t* label = lv_obj_get_child(arm_button, 0);
-
-    if (ARM)
-    {
-        lv_label_set_text(label, data1.text_on);
-        lv_obj_set_style_bg_color(arm_button, data1.color_on, LV_PART_MAIN);
-    }
-    else
-    {
-        lv_label_set_text(label, data1.text_off);
-        lv_obj_set_style_bg_color(arm_button, data1.color_off, LV_PART_MAIN);
-    }
+    update_toggle_button(arm_button, &data1);
 }
 
 // =====================================================

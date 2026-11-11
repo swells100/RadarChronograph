@@ -10,14 +10,14 @@ int previousShotTime;
 void setup()
 {
     Serial.begin(115200);
-    delay(1000);
+    delay(100);
 
     Serial.println("Starting Teensy 4.1 RA8875");
 
     // Restore settings from EEPROM
     load_settings();
 
-    previousShotTime = ShotTime;
+    previousShotTime = ShotTime; // shot time check
 
     // Initialize display using restored settings
     screen_init();
@@ -30,7 +30,7 @@ void loop()
 {
     lv_timer_handler();
 
-    screen_process_orientation();
+    screen_process_orientation(); //wait until orientation is processed
 
     // Variable test
     if (ARM == 1)
@@ -54,5 +54,5 @@ void loop()
         previousShotTime = ShotTime;
     }
 
-    delay(1);
+    //delay(1);
 }

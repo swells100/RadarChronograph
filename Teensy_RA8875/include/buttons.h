@@ -9,4 +9,6 @@ extern int ScreenBrightness;
 
 void create_buttons();
 void set_arm_state(bool armed); //set to false when data collection is done
+void buttons_update_layout();
+
 #endif

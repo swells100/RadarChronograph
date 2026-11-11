@@ -173,6 +173,8 @@ void screen_process_orientation()
 
         Serial.println("Landscape orientation");
     }
+    // Resize sliders before refreshing the display
+    buttons_update_layout();
 
     // Clear the display and request a complete LVGL redraw
     tft.fillScreen(RA8875_BLACK);
