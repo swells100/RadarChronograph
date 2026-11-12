@@ -6,6 +6,8 @@
 #include "settings.h"
 
 int previousShotTime;
+int previousPortrait;
+int previousARM;
 
 void setup()
 {
@@ -18,6 +20,8 @@ void setup()
     load_settings();
 
     previousShotTime = ShotTime; // shot time check
+    previousPortrait = Portrait;
+    previousARM = ARM;
 
     // Initialize display using restored settings
     screen_init();
@@ -33,12 +37,16 @@ void loop()
     screen_process_orientation(); //wait until orientation is processed
 
     // Variable test
-    if (ARM == 1)
-        Serial.println("ARM is ON");
-
-    if (Portrait == 1)
+    if (ARM != previousARM)
     {
-        Serial.println("Portrait mode is ON");
+        Serial.println(ARM ? "ARM is ON" : "ARM is OFF");
+        previousARM = ARM;
+    }
+       
+    if (Portrait != previousPortrait)
+    {
+        Serial.println(Portrait ? "Portrait mode is ON" : "Portrait mode is OFF");
+        previousPortrait = Portrait;
         //set_arm_state(false);
     }
 

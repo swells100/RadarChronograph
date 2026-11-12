@@ -51,17 +51,8 @@ static void update_toggle_button(lv_obj_t* button, ButtonData* data)
     if (button == nullptr) return;
 
     lv_obj_t* label = lv_obj_get_child(button, 0);
-
-    lv_label_set_text(
-        label,
-        data->value ? data->text_on : data->text_off
-    );
-
-    lv_obj_set_style_bg_color(
-        button,
-        data->value ? data->color_on : data->color_off,
-        LV_PART_MAIN
-    );
+    lv_label_set_text(label,data->value ? data->text_on : data->text_off);
+    lv_obj_set_style_bg_color(button,data->value ? data->color_on : data->color_off,LV_PART_MAIN);
 }
 
 // =====================================================
@@ -145,8 +136,7 @@ static void brightness_cb(lv_event_t* event)
 // color: button color
 // destination_screen: screen to navigate to when button is clicked
 // toggle_data: toggle button data
-// user_data: user data passed to callback
-// callbackFunction: executed when button is clicked
+// callback: executed when button is clicked
 // =====================================================
 static lv_obj_t* create_button(
     lv_obj_t* parent,
@@ -158,46 +148,35 @@ static lv_obj_t* create_button(
     lv_color_t color,
     lv_obj_t* destination_screen = nullptr,
     ButtonData* toggle_data = nullptr,
-    void* user_data = nullptr,
     lv_event_cb_t callback = nullptr
-    )
+)
 {
     lv_obj_t* button = lv_button_create(parent);
 
     lv_obj_set_pos(button, x, y);
     lv_obj_set_size(button, width, height);
 
-    // Initial appearance
+    // Configure toggle behavior
     if (toggle_data)
     {
-        text = toggle_data->value ? toggle_data->text_on : toggle_data->text_off;
-        color = toggle_data->value ? toggle_data->color_on : toggle_data->color_off;
-
         callback = button_cb;
-        user_data = toggle_data;
+        update_toggle_button(button, toggle_data); //initialize toggle button appearance
     }
 
     // Button background
     lv_obj_set_style_bg_color(button, color, LV_PART_MAIN);
-    // Remove default shadow
     lv_obj_set_style_shadow_width(button, 0, LV_PART_MAIN);
 
     // Screen navigation
     if (destination_screen)
     {
-        lv_obj_add_event_cb(
-            button,
-            [](lv_event_t* event)
-            {
-                lv_screen_load((lv_obj_t*)lv_event_get_user_data(event));
-            },
-            LV_EVENT_CLICKED,
-            destination_screen
-        );
+        lv_obj_add_event_cb(button,[](lv_event_t* event)
+            {lv_screen_load((lv_obj_t*)lv_event_get_user_data(event));},LV_EVENT_CLICKED,destination_screen);
     }
+
     if (callback)
     {
-        lv_obj_add_event_cb(button, callback, LV_EVENT_CLICKED, user_data);
+        lv_obj_add_event_cb(button,callback,LV_EVENT_CLICKED,toggle_data);
     }
 
     // Button label
@@ -210,7 +189,7 @@ static lv_obj_t* create_button(
 
 void set_arm_state(bool armed)
 {
-    ARM = armed ? 1 : 0;
+    ARM = armed;
     data1.value = ARM;
 
     update_toggle_button(arm_button, &data1);

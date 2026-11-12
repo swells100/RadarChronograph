@@ -132,7 +132,6 @@ static void initLVGL()
 
     lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565);
 
-
     DMAMEM static uint16_t buf[480 * 272/10*2];
     lv_display_set_buffers(display, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
