@@ -4,11 +4,13 @@
 #include "screen.h"
 #include "buttons.h"
 #include "settings.h"
+#include "main_screen.h"
 
 int previousShotTime;
 int previousPortrait;
 int previousARM;
-
+int currentShotNumber = 0;
+int currentVelocity = 10;
 void setup()
 {
     Serial.begin(115200);
@@ -28,6 +30,7 @@ void setup()
 
     // Create LVGL buttons and screens
     create_buttons();
+    
 }
 
 void loop()
@@ -41,6 +44,9 @@ void loop()
     {
         Serial.println(ARM ? "ARM is ON" : "ARM is OFF");
         previousARM = ARM;
+        currentShotNumber++;
+        currentVelocity = 10*currentShotNumber; // Example velocity value
+        main_screen_update_values(currentShotNumber, currentVelocity);
     }
        
     if (Portrait != previousPortrait)
@@ -48,6 +54,7 @@ void loop()
         Serial.println(Portrait ? "Portrait mode is ON" : "Portrait mode is OFF");
         previousPortrait = Portrait;
         //set_arm_state(false);
+        //main_screen_update_values(currentShotNumber, currentVelocity);
     }
 
     //if (variable3 == 1)
@@ -62,5 +69,5 @@ void loop()
         previousShotTime = ShotTime;
     }
 
-    //delay(1);
+    delay(1);
 }
