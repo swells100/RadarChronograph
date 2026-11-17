@@ -4,9 +4,6 @@
 #include "main_screen.h"
 #include "buttons.h"
 
-// =====================================================
-// CREATE MAIN SCREEN
-// =====================================================
 static lv_obj_t* arm_button;
 static lv_obj_t* shot_counter_label;
 static lv_obj_t* velocity_label;

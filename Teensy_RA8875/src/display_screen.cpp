@@ -6,16 +6,9 @@
 #include "screen.h"
 #include "settings.h"
 
-// =====================================================
-// SCREEN OBJECTS
-// =====================================================
-
 static lv_obj_t* brightness_slider = nullptr;
 
-// =====================================================
 // ORIENTATION CALLBACK
-// =====================================================
-
 static void orientation_cb(lv_event_t* event)
 {
     lv_obj_t* sw = (lv_obj_t*)lv_event_get_target(event);
@@ -27,10 +20,7 @@ static void orientation_cb(lv_event_t* event)
     save_settings();
 }
 
-// =====================================================
 // BRIGHTNESS CALLBACK
-// =====================================================
-
 static void brightness_cb(lv_event_t* event)
 {
     lv_obj_t* slider = (lv_obj_t*)lv_event_get_target(event);
@@ -46,10 +36,7 @@ static void brightness_cb(lv_event_t* event)
     lv_label_set_text_fmt(label, "%d%%", ScreenBrightness);
 }
 
-// =====================================================
 // CREATE DISPLAY SCREEN
-// =====================================================
-
 void create_display_screen(lv_obj_t* display_screen,lv_obj_t* settings_screen)
 {
     lv_obj_set_style_bg_color(display_screen,lv_color_hex(0x000000),LV_PART_MAIN);
@@ -98,10 +85,7 @@ void create_display_screen(lv_obj_t* display_screen,lv_obj_t* settings_screen)
     lv_obj_add_event_cb(brightness_slider,[](lv_event_t* event){save_settings();},LV_EVENT_RELEASED,NULL);
 }
 
-// =====================================================
 // UPDATE DISPLAY SCREEN LAYOUT
-// =====================================================
-
 void display_screen_update_layout()
 {
     if (brightness_slider == nullptr) return;

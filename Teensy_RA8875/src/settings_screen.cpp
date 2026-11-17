@@ -5,16 +5,9 @@
 #include "buttons.h"
 #include "settings.h"
 
-// =====================================================
-// SCREEN OBJECTS
-// =====================================================
-
 static lv_obj_t* shot_slider = nullptr;
 
-// =====================================================
 // SHOT TIME CALLBACK
-// =====================================================
-
 static void shot_time_cb(lv_event_t* event)
 {
     lv_obj_t* slider = (lv_obj_t*)lv_event_get_target(event);
@@ -27,10 +20,7 @@ static void shot_time_cb(lv_event_t* event)
     lv_label_set_text_fmt(label,"%d s",ShotTime);
 }
 
-// =====================================================
 // CREATE SETTINGS SCREEN
-// =====================================================
-
 void create_settings_screen(lv_obj_t* settings_screen,lv_obj_t* main_screen,lv_obj_t* display_screen)
 {
     lv_obj_set_style_bg_color(settings_screen,lv_color_hex(0x000000),LV_PART_MAIN);
@@ -80,10 +70,7 @@ void create_settings_screen(lv_obj_t* settings_screen,lv_obj_t* main_screen,lv_o
     lv_obj_add_event_cb(shot_slider,[](lv_event_t* event){save_settings();},LV_EVENT_RELEASED,NULL);
 }
 
-// =====================================================
 // UPDATE SETTINGS SCREEN LAYOUT
-// =====================================================
-
 void settings_screen_update_layout()
 {
     if (shot_slider == nullptr) return;

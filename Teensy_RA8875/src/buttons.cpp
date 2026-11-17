@@ -10,19 +10,13 @@
 #include "settings_screen.h"
 #include "display_screen.h"
 
-// =====================================================
 // HARDWARE-READABLE VARIABLES
-// =====================================================
-
 int ARM = 0;
 int Portrait = 0;
 int ShotTime = 10;
 int ScreenBrightness = 100;
 
-// =====================================================
 // TOGGLE CALLBACK
-// =====================================================
-
 void toggle_button_cb(lv_event_t* event)
 {
     lv_obj_t* button = (lv_obj_t*)lv_event_get_target(event);
@@ -32,20 +26,14 @@ void toggle_button_cb(lv_event_t* event)
 
     data->value = !data->value;
 
-    if (data->linked_value != nullptr)
-    {
-        *data->linked_value = data->value;
-    }
+    if (data->linked_value != nullptr) *data->linked_value = data->value;
 
     lv_obj_t* label = lv_obj_get_child(button, 0);
     lv_label_set_text(label,data->value ? data->text_on : data->text_off);
     lv_obj_set_style_bg_color(button,data->value ? data->color_on : data->color_off,LV_PART_MAIN);
 }
 
-// =====================================================
 // CREATE PAGE HEADER
-// =====================================================
-
 void create_page_header(lv_obj_t* parent,const char* back_text,const char* title_text,lv_obj_t* destination_screen)
 {
 
@@ -69,20 +57,14 @@ void create_page_header(lv_obj_t* parent,const char* back_text,const char* title
     lv_obj_add_event_cb(button,[](lv_event_t* event){lv_screen_load((lv_obj_t*)lv_event_get_user_data(event));},LV_EVENT_CLICKED,destination_screen);
 }
 
-// =====================================================
 // UPDATE SCREEN LAYOUTS AFTER ORIENTATION CHANGE
-// =====================================================
-
 void buttons_update_layout()
 {
     settings_screen_update_layout();
     display_screen_update_layout();
 }
 
-// =====================================================
 // CREATE ALL SCREENS
-// =====================================================
-
 void create_buttons()
 {
     // Create screen objects

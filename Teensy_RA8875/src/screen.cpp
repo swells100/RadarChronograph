@@ -32,14 +32,9 @@ static constexpr uint16_t TFT_LANDSCAPE_HEIGHT = 272;
 static constexpr uint16_t TFT_PORTRAIT_WIDTH = 272;
 static constexpr uint16_t TFT_PORTRAIT_HEIGHT = 480;
 
-
 static lv_display_t *display;
 static bool rotation = false;
 static bool orientation_change_pending = false;
-
-// =====================================================
-// DISPLAY OBJECTS
-// =====================================================
 
 // Native Teensy SPI0
 RA8875 tft(RA8875_CS, RA8875_RESET,RA8875_MOSI, RA8875_SCK, RA8875_MISO);
@@ -47,10 +42,8 @@ void screen_set_brightness(uint8_t brightness)
 {
     tft.brightness(brightness);
 }
-// =====================================================
-// DISPLAY FLUSH
-// =====================================================
 
+// DISPLAY FLUSH
 static void displayFlush(
     lv_display_t *display,
     const lv_area_t *area,
@@ -66,10 +59,7 @@ static void displayFlush(
     lv_display_flush_ready(display);
 }
 
-// =====================================================
 // TOUCH INPUT
-// =====================================================
-
 static void my_touch_read_cb(lv_indev_t *indev,lv_indev_data_t *data)
 {
     static uint16_t touch_coordinates[5][2];
@@ -91,10 +81,7 @@ static void my_touch_read_cb(lv_indev_t *indev,lv_indev_data_t *data)
     }
 }
 
-// =====================================================
 // INITIALIZE DISPLAY
-// =====================================================
-
 static void initDisplay()
 {
     SPI.begin();
@@ -111,10 +98,7 @@ static void initDisplay()
     Serial.println("RA8875 initialized");
 }
 
-// =====================================================
 // INITIALIZE LVGL
-// =====================================================
-
 static void initLVGL()
 {
     //Initialize LVGL
@@ -180,10 +164,8 @@ void screen_process_orientation()
     lv_obj_invalidate(lv_screen_active());
     lv_refr_now(display);
 }
-// =====================================================
-// PUBLIC SCREEN INITIALIZATION
-// =====================================================
 
+// PUBLIC SCREEN INITIALIZATION
 void screen_init()
 {
     Serial.println("Initializing screen...");
