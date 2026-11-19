@@ -46,14 +46,14 @@ void loop()
         previousARM = ARM;
         currentShotNumber++;
         currentVelocity = 10*currentShotNumber; // Example velocity value
-        main_screen_update_values(currentShotNumber, currentVelocity);
+        main_screen_update_values(currentShotNumber, currentVelocity); // Update the main screen with new values
     }
        
     if (Portrait != previousPortrait)
     {
         Serial.println(Portrait ? "Portrait mode is ON" : "Portrait mode is OFF");
         previousPortrait = Portrait;
-        //set_arm_state(false);
+        //set_arm_state(false); // Reset ARM state
         //main_screen_update_values(currentShotNumber, currentVelocity);
     }
 
