@@ -4,6 +4,7 @@
 
 static bool armed = false;
 static uint32_t armed_at = 0;
+static uint32_t duration_ms = ARM_DURATION_MS;
 
 static void announce(const char *msg) {
 #if RADAR_DEBUG_SERIAL
@@ -39,7 +40,7 @@ void arm_cancel() {
 }
 
 void arm_update() {
-  if (armed && (uint32_t)(millis() - armed_at) >= ARM_DURATION_MS) {
+  if (armed && (uint32_t)(millis() - armed_at) >= duration_ms) {
     armed = false;
     digitalWriteFast(PIN_RADAR_ENABLE, HIGH);
     announce("DISARMED (timeout): radar enable pin HIGH");
@@ -51,5 +52,8 @@ bool arm_active() { return armed; }
 uint32_t arm_ms_left() {
   if (!armed) return 0;
   uint32_t used = millis() - armed_at;
-  return used >= ARM_DURATION_MS ? 0 : ARM_DURATION_MS - used;
+  return used >= duration_ms ? 0 : duration_ms - used;
 }
+
+void arm_set_duration_ms(uint32_t ms) { if (ms >= 1000) duration_ms = ms; }   // ignore nonsense values
+uint32_t arm_duration_ms() { return duration_ms; }

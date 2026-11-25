@@ -19,6 +19,8 @@
 #include "transport.h"
 #include "arm_control.h"
 #include "command.h"
+#include "shot_summary.h"
+#include "lcd/lcd_ui.h"
 
 static float spectrum[FFT_SIZE];      // FFT_BINS complex values (DTCM scratch)
 static uint32_t warmup_left = WARMUP_BLOCKS;
@@ -26,6 +28,7 @@ static uint32_t last_report = 0;
 static uint32_t blocks = 0;
 static uint32_t max_proc_us = 0;
 static uint32_t last_bullets = 0;
+static uint32_t shot_count = 0;                  // shots completed since power-up (shown on the display)
 static uint16_t sig_min = 0xFFFF, sig_max = 0;   // raw Doppler level seen since the last status line
 
 void setup() {
@@ -37,6 +40,9 @@ void setup() {
   while (!Serial && millis() - t0 < 2000) {}
 
   radar_logf("Teensy 4.1 radar starting");
+  shot_init(SHOT_MIN_SPEED_MPS);
+  lcd_init();                           // before the ADC starts: building the screens takes a while
+  arm_set_duration_ms(lcd_arm_duration_ms());
   fft_init();
   transport_init();
   if (!adc_acquire_begin()) {
@@ -55,7 +61,7 @@ void setup() {
              NET_DEST_IP[0], NET_DEST_IP[1], NET_DEST_IP[2], NET_DEST_IP[3], (unsigned)NET_DEST_PORT);
 #endif
   radar_logf("DISARMED at power-up. Send \"arm\" (or \"a\") over USB serial or the network link to arm for %lu s.\n",
-                (unsigned long)(ARM_DURATION_MS / 1000));
+                (unsigned long)(arm_duration_ms() / 1000));
   radar_logf("speed resolution %.2f m/s per bin, max unambiguous speed %.0f m/s\n",
                 (double)(adc_acquire_actual_rate_hz() / (float)FFT_SIZE * DOPPLER_MPS_PER_HZ),
                 (double)(adc_acquire_actual_rate_hz() * 0.5f * DOPPLER_MPS_PER_HZ));
@@ -67,7 +73,11 @@ void loop() {
   // Commands from USB serial and from the PC over TCP.
   { CmdSource src; for (int c; (c = transport_read_byte(&src)) >= 0;) command_feed(c, src); }
   command_poll();
-  arm_update();                         // auto-disarm after ARM_DURATION_MS
+  if (!arm_active()) arm_set_duration_ms(lcd_arm_duration_ms());   // "Shot Time" setting; not changed in mid-arming
+  if (lcd_take_arm_toggle()) {          // ARM button on the touch display
+    if (arm_active()) arm_cancel(); else arm_request();
+  }
+  arm_update();                         // auto-disarm when the arm time is up
 
   AdcBlock blk;
   if (adc_acquire_poll(&blk)) {
@@ -86,6 +96,15 @@ void loop() {
       DetectResult d = detect_update(spectrum, armed && !bandpass_settling());   // skip the filter start-up transient
       last_bullets = d.bullet_count;
       if (armed) d.flags |= FLAG_ARMED;
+
+      ShotResult shot;
+      if (shot_update(d.flags, d.speed_mps, d.mag, d.freq_hz, armed, &shot)) {
+        shot_count++;
+        radar_logf("SHOT #%lu  v=%.1f m/s = %.1f mph = %.0f ft/s  (%.0f Hz, %lu blocks)\n",
+                   (unsigned long)shot_count, (double)shot.speed_mps, (double)(shot.speed_mps * 2.236936f),
+                   (double)(shot.speed_mps * 3.28084f), (double)shot.freq_hz, (unsigned long)shot.blocks);
+        lcd_show_shot(shot_count, shot.speed_mps);   // only stores the text; it is drawn in the idle part of loop()
+      }
 
       uint8_t *slot = transport_acquire_slot();
       if (slot) {
@@ -124,6 +143,10 @@ void loop() {
       blocks++;
     }
     adc_acquire_release();
+  } else {
+    // No block waiting: the only time the display may use the CPU (a screen update can take several ms).
+    lcd_set_armed(arm_active(), arm_ms_left());
+    lcd_service(shot_active());
   }
 
   if (millis() - last_report >= 2000) {

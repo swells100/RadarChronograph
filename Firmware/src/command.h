@@ -1,6 +1,6 @@
 // command.h - tiny text command interpreter (USB serial and the TCP link)
 //
-//   arm | a        arm for ARM_DURATION_MS (again while armed: restart the timer)
+//   arm | a        arm for the arm time (display Shot Time, default ARM_DURATION_MS) (again while armed: restart the timer)
 //   disarm | d     disarm now
 //   status | s | ? print the current state
 //   band           show the band-pass filter edges

@@ -25,7 +25,7 @@ static void run(int src) {
   if (!strcmp(buf, "a") || !strcmp(buf, "arm")) {
     arm_request();
     char m[48];
-    snprintf(m, sizeof m, "OK armed for %lu ms", (unsigned long)ARM_DURATION_MS);
+    snprintf(m, sizeof m, "OK armed for %lu ms", (unsigned long)arm_duration_ms());
     reply(src, m);
   } else if (!strcmp(buf, "d") || !strcmp(buf, "disarm")) {
     arm_cancel();

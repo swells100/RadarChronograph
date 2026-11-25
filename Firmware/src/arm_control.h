@@ -9,7 +9,11 @@ void arm_init();
 void arm_request();          // arm, or restart the timer if already armed
 void arm_cancel();           // disarm now
 
-// Call every loop(): disarms when the ARM_DURATION_MS timer runs out.
+// How long one arming lasts. Default ARM_DURATION_MS; the touch display's "Shot Time" setting changes it.
+void     arm_set_duration_ms(uint32_t ms);
+uint32_t arm_duration_ms();
+
+// Call every loop(): disarms when the arm timer runs out.
 void arm_update();
 
 bool     arm_active();

@@ -61,6 +61,18 @@ static constexpr uint32_t FFT_BINS = FFT_SIZE / 2;    // bins sent: 0 .. fs/2 (e
 #define RADAR_WINDOW_BLACKMAN  1
 #define RADAR_WINDOW           RADAR_WINDOW_BLACKMAN
 
+// ---------------------------------------------------------------------------
+// Touch display (RA8875 480x272 + FT5206 touch + LVGL), from swells100/RadarChronograph Teensy_RA8875
+//   RA8875: CS pin 8, RESET pin 9, SPI0 = MOSI 11 / MISO 12 / SCK 13
+//   FT5206 touch: I2C (Wire: SDA 18, SCL 19), as wired by the original project
+//   RADAR_LCD 0 leaves the display code out of the build.
+// The UI's "Shot Time" setting (5-90 s) is the arm time; ARM_DURATION_MS below is only the default when no display.
+// ---------------------------------------------------------------------------
+#define RADAR_LCD 1
+static constexpr uint32_t LCD_SERVICE_MS   = 5;      // run LVGL at most this often
+static constexpr uint32_t LCD_MAX_DEFER_MS = 400;    // never hold the screen back longer than this while a shot is tracked
+static constexpr float    SHOT_MIN_SPEED_MPS = 6.0f; // tracks slower than this are not reported as shots
+
 #define RADAR_REMOVE_DC   1   // subtract per-block mean (removes the 1.65 V bias)
 
 // ---------------------------------------------------------------------------
